@@ -1,4 +1,4 @@
-# Freestyle Android LibreLink Data Extractor
+# Freestyle LibreLink Android Data Extractor/Exporter
 This is a simple python 2.7 script for pulling data from an Android phone running LibreLink (US version) for Freestyle Libre sensor to CSV files on your PC/Mac (only tested on Mac). LibraLink stores data in SQL database files.  The script downloads the data from the phone, extracts the data, reads the SQL database for `historicReadings`, `notes`, and then merges them into a single CSV sorted by timestampUTC.
 
 1. Install Android Debugger (ADB) by [Installing Android Studio](https://developer.android.com/studio)
