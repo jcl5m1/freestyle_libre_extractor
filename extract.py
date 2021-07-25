@@ -13,8 +13,7 @@ print('extracting archive')
 # https://stackoverflow.com/questions/18533567/how-to-extract-or-unpack-an-ab-file-android-backup-file
 os.system("( printf \"\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\" ; tail -c +25 backup.ab ) |  tar xfvz -")
 
-
-print('extracting data')
+# convert sql table to csv file
 def extract_to_csv(dbfile, tablename):
     con = sqlite3.connect(dbfile)
     cur = con.cursor()
@@ -31,6 +30,8 @@ def extract_to_csv(dbfile, tablename):
     con.close()
     return file
 
+print('extracting data')
+
 # load historical readings db in sql, and extract desired data
 dbfile = "apps/com.freestylelibre.app.us/f/sas.db"
 readingsFile = extract_to_csv(dbfile, 'historicReadings')
@@ -39,7 +40,7 @@ dbfile = "apps/com.freestylelibre.app.us/f/apollo.db"
 notesFile = extract_to_csv(dbfile, 'notes')
 print("Saved to " + notesFile)
 
-# merge CSVs using timestampUTC
+# load csv into memory as dict
 def load_csv_as_dict(file):
     columns = []
     with open(file, 'r') as f:
@@ -55,10 +56,11 @@ def load_csv_as_dict(file):
     as_dict = {c[0] : c[1:] for c in columns}
     return as_dict
 
-# merge both in to a single csv file sharing only timestampUTC
+# merge both CSV into a single CSV sharing timestampUTC
 notes_dict = load_csv_as_dict(notesFile)
 readings_dict = load_csv_as_dict(readingsFile)
 merged = []
+
 for i in range(len(notes_dict['timestampUTC'])):
     row = {}
     for c in notes_dict.keys():
@@ -79,6 +81,7 @@ for i in range(len(readings_dict['timestampUTC'])):
 
 merged.sort(key=lambda x: x['timestampUTC'])
 
+# save merged to CSV file
 ts = str(int(time.time()))
 file = ts + "_merged.csv"
 with open(file, 'w') as f:
